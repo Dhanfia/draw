@@ -3,13 +3,13 @@ const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 let isDrawing = false;
 
+const colorPickerInput = document.querySelector('.color-picker');
 const clearButton = document.querySelector('.clear-button');
 const downloadButton = document.querySelector('.download-button');
 
 canvas.addEventListener('mousedown', startDrawing);
 canvas.addEventListener('mousemove', draw);
 canvas.addEventListener('mouseup', stopDrawing);
-
 
 canvas.addEventListener('touchstart', startDrawingMobile);
 canvas.addEventListener('touchmove', drawInMobile);
@@ -40,7 +40,7 @@ function draw({ clientX: x, clientY: y }) {
     } 
     ctx.lineWidth = 8;
     ctx.lineCap = "round";
-    ctx.strokeStyle = "#171717";
+    ctx.strokeStyle = colorPickerInput.value;
     ctx.lineTo(x, y);
     ctx.stroke();
     ctx.beginPath();
@@ -52,11 +52,11 @@ function drawInMobile(e) {
     if (!isDrawing) {
         return;
     } 
-    let x = event.touches[0].pageX;
-    let y =  event.touches[0].pageY;
+    let x = event.touches[0].clientX;
+    let y =  event.touches[0].clientY;
     ctx.lineWidth = 8;
     ctx.lineCap = "round";
-    ctx.strokeStyle = "#171717";
+    ctx.strokeStyle = colorPickerInput.value;
     ctx.lineTo(x, y);
     ctx.stroke();
     ctx.beginPath();

@@ -1,33 +1,39 @@
 body {
     margin: 0;
     padding: 0;
-    width: 100vw;
-    height: 100vh;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
     background: #F3F3F3;
+    position: fixed;
     font-family: 'Roboto', 'Helvetica', sans-serif;
 }
 
 .tools {
     position: absolute;
+    right: 0;
     top: 0;
-    left: 0;
-    bottom: 0;
     width: 50px;
-    background: #171717;
 }
 
-.brush {
-    position: relative;
-    background-color: #F3F3F3;   
-    background-image: url("images/brush.png");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: 28px;
+.tool {
+    width: 36px;
+    height: 36px;
+    margin: 4px auto;
+    border-radius: 50%;
+}
+
+.color-picker {
+    border: none;
+    width: 20px;
+    margin: 0;
+    padding: 8px;
+    height: 20px;
     display: block;
-    width: 30px;
-    height: 30px;
-    margin: 8px auto;   
-    border-radius: 6px;
+    background-color: transparent;
+    /* border-radius: 50%; */
+    /* -webkit-appearance: inner-spin-button; */
 }
 
 .clear-button {
@@ -38,11 +44,11 @@ body {
     border: none;
     outline: none;
     cursor: pointer;
-    background-color: #F3F3F3;   
+    background-color: #F3F3F3;
     background-image: url("images/delete.png");
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 28px;
+    background-size: 24px;
     border-radius: 6px;
 }
 
@@ -50,14 +56,14 @@ body {
     display: block;
     width: 30px;
     height: 30px;
-    margin: 8px auto;
+    margin: 0 auto;
     border: none;
     outline: none;
     cursor: pointer;
-    background-color: #F3F3F3;   
+    background-color: #F3F3F3;
     background-image: url("images/download.png");
     background-repeat: no-repeat;
     background-position: center;
-    background-size: 24px;
+    background-size: 20px;
     border-radius: 6px;
 }
