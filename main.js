@@ -64,12 +64,14 @@ function drawInMobile(e) {
 }
 
 function clearCanvas() {
+    stopDrawing();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function downloadAsImage() {
     var dataURL = canvas.toDataURL('image/png');
     downloadButton.href = dataURL;
+    stopDrawing();
 }
 
 function resizeCanvas() {
