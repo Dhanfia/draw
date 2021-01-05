@@ -1,82 +1,63 @@
-
-const canvas = document.querySelector('canvas');
+const canvas = document.getElementById('canvas');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 const ctx = canvas.getContext('2d');
-let isDrawing = false;
 
-const colorPickerInput = document.querySelector('.color-picker');
+ctx.lineWidth = 10;
+ctx.lineCap = 'round';
+
+var isDrawing, points = [ ];
+
+// const colorPickerInput = document.querySelector('.color-picker');
 const clearButton = document.querySelector('.clear-button');
 const downloadButton = document.querySelector('.download-button');
 
-canvas.addEventListener('mousedown', startDrawing);
-canvas.addEventListener('mousemove', draw);
-canvas.addEventListener('mouseup', stopDrawing);
-
-canvas.addEventListener('touchstart', startDrawingMobile);
-canvas.addEventListener('touchmove', drawInMobile);
-canvas.addEventListener('touchend', stopDrawing);
-
 clearButton.addEventListener('click', clearCanvas);
 downloadButton.addEventListener('click', downloadAsImage);
-window.addEventListener('resize', resizeCanvas);
 
-function startDrawing(e) {
-    isDrawing = true;
-    draw(e);
-}
+canvas.onmousedown = function(e) {
+  isDrawing = true;
+  points.push({ x: e.clientX, y: e.clientY });
+};
 
-function startDrawingMobile(e) {
-    isDrawing = true;
-    drawInMobile(e);
-}
+canvas.onmousemove = function(e) {
+  
+  if (!isDrawing) return;
+ 
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  points.push({ x: e.clientX, y: e.clientY });
+
+  ctx.beginPath();
+  
+
+  for (i = 1; i < points.length - 2; i ++)
+  {
+     var xc = (points[i].x + points[i + 1].x) / 2;
+     var yc = (points[i].y + points[i + 1].y) / 2;
+    
+     ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
+  }
+  ctx.stroke();
+};
+
+canvas.onmouseup = function() {
+  stopDrawing();
+  points.length = 0;
+};
 
 function stopDrawing() {
-    isDrawing = false;
-    ctx.beginPath();
-}
-
-function draw({ clientX: x, clientY: y }) {
-    if (!isDrawing) {
-        return;
-    } 
-    ctx.lineWidth = 8;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = colorPickerInput.value;
-    ctx.lineTo(x, y);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-}
-
-
-function drawInMobile(e) {
-    if (!isDrawing) {
-        return;
-    } 
-    let x = event.touches[0].clientX;
-    let y =  event.touches[0].clientY;
-    ctx.lineWidth = 8;
-    ctx.lineCap = "round";
-    ctx.strokeStyle = colorPickerInput.value;
-    ctx.lineTo(x, y);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(x, y);
+  isDrawing = false;
+  ctx.beginPath();
 }
 
 function clearCanvas() {
-    stopDrawing();
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  isDrawing = false;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function downloadAsImage() {
-    var dataURL = canvas.toDataURL('image/png');
-    downloadButton.href = dataURL;
-    stopDrawing();
+  var dataURL = canvas.toDataURL('image/png');
+  downloadButton.href = dataURL;
+  stopDrawing();
 }
 
-function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-}
-
-resizeCanvas();
