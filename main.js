@@ -3,10 +3,11 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 const ctx = canvas.getContext('2d');
 
-ctx.lineWidth = 10;
-ctx.lineCap = 'round';
-
 var isDrawing, points = [ ];
+var paths = [];
+
+ctx.lineWidth = 12;
+ctx.lineCap = 'round';
 
 // const colorPickerInput = document.querySelector('.color-picker');
 const clearButton = document.querySelector('.clear-button');
@@ -17,27 +18,31 @@ downloadButton.addEventListener('click', downloadAsImage);
 
 canvas.onmousedown = function(e) {
   isDrawing = true;
-  points.push({ x: e.clientX, y: e.clientY });
+  paths[paths.length] = [];
+  paths[paths.length - 1].push({ x: e.clientX, y: e.clientY });
 };
 
 canvas.onmousemove = function(e) {
   
   if (!isDrawing) return;
  
-  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  points.push({ x: e.clientX, y: e.clientY });
-
-  ctx.beginPath();
   
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  paths[paths.length - 1].push({ x: e.clientX, y: e.clientY });
 
-  for (i = 1; i < points.length - 2; i ++)
-  {
-     var xc = (points[i].x + points[i + 1].x) / 2;
-     var yc = (points[i].y + points[i + 1].y) / 2;
-    
-     ctx.quadraticCurveTo(points[i].x, points[i].y, xc, yc);
-  }
-  ctx.stroke();
+  paths.forEach(path => {
+
+    ctx.beginPath();
+
+    for (i = 1; i < path.length - 2; i ++) {
+       var xc = (path[i].x + path[i + 1].x) / 2;
+       var yc = (path[i].y + path[i + 1].y) / 2;
+      
+       ctx.quadraticCurveTo(path[i].x, path[i].y, xc, yc);
+    }
+    ctx.stroke();
+
+  });
 };
 
 canvas.onmouseup = function() {
@@ -53,6 +58,7 @@ function stopDrawing() {
 function clearCanvas() {
   isDrawing = false;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  paths.length = 0;
 }
 
 function downloadAsImage() {
