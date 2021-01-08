@@ -67,7 +67,7 @@ function up(e) {
 }
 
 function getPos(e) {
-  if (e.type === 'touchstart') {
+  if (e.type === 'touchstart' || e.type === 'touchmove' || e.type === 'touchend' ) {
     return {
        x : e.touches[0].clientX,	
        y :  e.touches[0].clientY
@@ -99,7 +99,7 @@ function rgb() {
 function clearCanvas() {
   isDown = false;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  paths.length = 0;
+  points.length = 0;
 }
 
 function downloadAsImage() {
