@@ -1,62 +1,103 @@
-const canvas = document.getElementById('canvas');
+let isDown = false;
+let points = [];
+let beginPoint = null;
+
+const canvas = document.querySelector('#canvas');
+const clearButton = document.querySelector('.clear-button');
+const downloadButton = document.querySelector('.download-button');
+
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 const ctx = canvas.getContext('2d');
 
-var isDrawing, points = [ ];
-var paths = [];
-
-ctx.lineWidth = 12;
+ctx.lineWidth = 10;
+ctx.lineJoin = 'round';
 ctx.lineCap = 'round';
 
-// const colorPickerInput = document.querySelector('.color-picker');
-const clearButton = document.querySelector('.clear-button');
-const downloadButton = document.querySelector('.download-button');
+canvas.addEventListener('mousedown', down, false);
+canvas.addEventListener('mousemove', move, false);
+canvas.addEventListener('mouseup', up, false);
+canvas.addEventListener('mouseout', up, false);
+canvas.addEventListener('touchstart', down, false);
+canvas.addEventListener('touchmove', move, false);	
+canvas.addEventListener('touchend', up, false);
 
 clearButton.addEventListener('click', clearCanvas);
 downloadButton.addEventListener('click', downloadAsImage);
 
-canvas.onmousedown = function(e) {
-  isDrawing = true;
-  paths[paths.length] = [];
-  paths[paths.length - 1].push({ x: e.clientX, y: e.clientY });
-};
-
-canvas.onmousemove = function(e) {
-  
-  if (!isDrawing) return;
- 
-  
-  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-  paths[paths.length - 1].push({ x: e.clientX, y: e.clientY });
-
-  paths.forEach(path => {
-
-    ctx.beginPath();
-
-    for (i = 1; i < path.length - 2; i ++) {
-       var xc = (path[i].x + path[i + 1].x) / 2;
-       var yc = (path[i].y + path[i + 1].y) / 2;
-      
-       ctx.quadraticCurveTo(path[i].x, path[i].y, xc, yc);
-    }
-    ctx.stroke();
-
-  });
-};
-
-canvas.onmouseup = function() {
-  stopDrawing();
-  points.length = 0;
-};
-
-function stopDrawing() {
-  isDrawing = false;
-  ctx.beginPath();
+function down(e) {
+    isDown = true;
+    const { x, y } = getPos(e);
+    points.push({x, y});
+    beginPoint = {x, y};   
+    ctx.strokeStyle = rgb();
 }
 
+function move(e) {
+    if (!isDown) return;
+  
+    const { x, y } = getPos(e);
+    points.push({x, y});
+
+    if (points.length > 3) {
+        const lastTwoPoints = points.slice(-2);
+        const controlPoint = lastTwoPoints[0];
+        const endPoint = {
+            x: (lastTwoPoints[0].x + lastTwoPoints[1].x) / 2,
+            y: (lastTwoPoints[0].y + lastTwoPoints[1].y) / 2,
+        }
+        drawLine(beginPoint, controlPoint, endPoint);
+        beginPoint = endPoint;
+    }
+}
+
+function up(e) {
+    if (!isDown) return;
+    const { x, y } = getPos(e);
+    points.push({x, y});
+    if (points.length > 3) {
+        const lastTwoPoints = points.slice(-2);
+        const controlPoint = lastTwoPoints[0];
+        const endPoint = lastTwoPoints[1];
+        drawLine(beginPoint, controlPoint, endPoint);
+    }
+    beginPoint = null;
+    isDown = false;
+    points = [];
+}
+
+function getPos(e) {
+  if (e.type === 'touchstart') {
+    return {
+       x : e.touches[0].clientX,	
+       y :  e.touches[0].clientY
+    }
+  }
+    return {
+        x: e.clientX,
+        y: e.clientY
+    }
+}
+
+function drawLine(beginPoint, controlPoint, endPoint) {
+    ctx.beginPath();
+    ctx.moveTo(beginPoint.x, beginPoint.y);
+    ctx.quadraticCurveTo(controlPoint.x, controlPoint.y, endPoint.x, endPoint.y); 
+    ctx.stroke();
+    ctx.closePath();
+}
+
+function rgb() {
+  color = 'rgb(';
+  for(var i = 0; i< 3; i++) {
+    color += Math.floor(Math.random() * 255)+',';
+  }
+  return color.replace(/\,$/,')');
+} 
+
+
 function clearCanvas() {
-  isDrawing = false;
+  isDown = false;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   paths.length = 0;
 }
@@ -64,6 +105,6 @@ function clearCanvas() {
 function downloadAsImage() {
   var dataURL = canvas.toDataURL('image/png');
   downloadButton.href = dataURL;
-  stopDrawing();
+  isDown = false;
+  ctx.beginPath();
 }
-
